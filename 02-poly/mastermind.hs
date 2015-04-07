@@ -42,28 +42,36 @@ matches secret guess = sum $ map comp $ zip (countColors secret) (countColors gu
 -- Construct a Move from a guess given the actual code
 getMove :: Code -> Code -> Move
 getMove secret guess = Move guess exact (allMatches - exact)
-    where exact = exactMatches secret guess
+    where exact      = exactMatches secret guess
           allMatches = matches secret guess
 
 -- Exercise 4 -----------------------------------------
 
 isConsistent :: Move -> Code -> Bool
-isConsistent move@(Move guess _ _) secret  = getMove secret guess == move
+isConsistent move@(Move guess _ _) secret = getMove secret guess == move
 
 -- Exercise 5 -----------------------------------------
 
 filterCodes :: Move -> [Code] -> [Code]
-filterCodes = undefined
+filterCodes move candidates = filter (isConsistent move) candidates
 
 -- Exercise 6 -----------------------------------------
 
 allCodes :: Int -> [Code]
-allCodes = undefined
+allCodes 0 = [[]]
+allCodes n = concatMap (\x -> map (x:) $ allCodes (n-1)) colors
 
 -- Exercise 7 -----------------------------------------
 
+findMoves :: Code -> [Move] -> [Move]
+findMoves _ [] = []
+findMoves secret (move@(Move _ exact _):xs)
+    | exact == length secret = [move]
+    | otherwise              = move : findMoves secret xs
+
 solve :: Code -> [Move]
-solve = undefined
+solve secret = findMoves secret allMoves
+    where allMoves = map (getMove secret) $ allCodes $ length secret 
 
 -- Bonus ----------------------------------------------
 
